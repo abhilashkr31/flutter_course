@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import './product_manager.dart';
 
 void main() {
@@ -8,7 +7,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,7 +14,7 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: Text("Easy List"),
         ),
-        body: ProductManager(),
+        body: ProductManager('Food Tester'),
       ),
     );
   }
