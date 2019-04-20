@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './products.dart';
+
 class ProductManager extends StatelessWidget {
   final List<Map<String, dynamic>> products;
 
@@ -9,9 +10,7 @@ class ProductManager extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        Expanded(child: Products(products))
-      ],
+      children: [Expanded(child: Products(products))],
     );
   }
 }
