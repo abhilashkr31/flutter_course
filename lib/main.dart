@@ -12,15 +12,14 @@ void main() {
 class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _MyAppState();
   }
 }
 
 class _MyAppState extends State<MyApp> {
-  List <Map<String, String>> _products = [];
+  List<Map<String, String>> _products = [];
 
-    void _addProduct(Map<String, String> product) {
+  void _addProduct(Map<String, String> product) {
     setState(() {
       _products.add(product);
       print(_products);
@@ -29,8 +28,8 @@ class _MyAppState extends State<MyApp> {
 
   void _deleteProduct(int index) {
     setState(() {
-     _products.removeAt(index);
-     print(_products); 
+      _products.removeAt(index);
+      print(_products);
     });
   }
 
@@ -44,7 +43,8 @@ class _MyAppState extends State<MyApp> {
       ),
       //home: AuthPage(),
       routes: {
-        '/': (BuildContext context) => ProductsPage(_products, _addProduct, _deleteProduct),
+        '/': (BuildContext context) =>
+            ProductsPage(_products, _addProduct, _deleteProduct),
         '/admin': (BuildContext context) => ProductsAdminPage(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -61,6 +61,11 @@ class _MyAppState extends State<MyApp> {
           );
         }
         return null;
+      },
+      onUnknownRoute: (RouteSettings settings) {
+        return MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ProductsPage(_products, _addProduct, _deleteProduct));
       },
     );
   }
