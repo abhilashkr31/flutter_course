@@ -4,9 +4,29 @@ import './product_edit.dart';
 
 class ProductListPage extends StatelessWidget {
   final Function updateProduct;
+  final Function deleteProduct;
   final List<Map<String, dynamic>> products;
 
-  ProductListPage(this.products, this.updateProduct);
+  ProductListPage(this.products, this.updateProduct, this.deleteProduct);
+
+  Widget _buildEditButton(BuildContext context, index) {
+    return IconButton(
+      icon: Icon(Icons.edit),
+      onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return ProductEditPage(
+                product: products[index],
+                updateProduct: updateProduct,
+                index: index,
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +35,11 @@ class ProductListPage extends StatelessWidget {
         return Dismissible(
           key: Key(products[index]['title']),
           background: Container(color: Colors.red),
+          onDismissed: (DismissDirection direction) {
+            if (direction == DismissDirection.endToStart) {
+              deleteProduct(index);
+            }
+          },
           child: Column(
             children: <Widget>[
               ListTile(
@@ -25,22 +50,7 @@ class ProductListPage extends StatelessWidget {
                 ),
                 title: Text(products[index]['title']),
                 subtitle: Text('\$${products[index]['price'].toString()}'),
-                trailing: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (BuildContext context) {
-                          return ProductEditPage(
-                            product: products[index],
-                            updateProduct: updateProduct,
-                            index: index,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
+                trailing: _buildEditButton(context, index),
               ),
               Divider(),
             ],
