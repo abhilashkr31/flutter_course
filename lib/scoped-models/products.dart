@@ -15,27 +15,39 @@ class ProductsModel extends Model {
   }
 
   Product get selectedProduct {
-    if (_selectedProductIndex == null)
-      return null;
+    if (_selectedProductIndex == null) return null;
     return _products[_selectedProductIndex];
   }
 
   void addProduct(Product product) {
-      _products.add(product);
-      _selectedProductIndex = null;
-      print(_products);
+    _products.add(product);
+    _selectedProductIndex = null;
+    print(_products);
+  }
+
+  void toggleProductFavoriteStatus() {
+    final bool isCurrentFavorite = products[_selectedProductIndex].isFavorite;
+    final bool newFavoriteStatus = !isCurrentFavorite;
+    final Product updatedProduct = Product(
+        title: selectedProduct.title,
+        description: selectedProduct.description,
+        price: selectedProduct.price,
+        image: selectedProduct.image,
+        isFavorite: newFavoriteStatus);
+    _products[_selectedProductIndex] = updatedProduct;
+    _selectedProductIndex = null;
   }
 
   void updateProduct(Product product) {
-      _products[_selectedProductIndex] = product;
-      _selectedProductIndex = null;
-      print(_products);
+    _products[_selectedProductIndex] = product;
+    _selectedProductIndex = null;
+    print(_products);
   }
 
   void deleteProduct() {
-      _products.removeAt(_selectedProductIndex);
-      _selectedProductIndex = null;
-      print(_products);
+    _products.removeAt(_selectedProductIndex);
+    _selectedProductIndex = null;
+    print(_products);
   }
 
   void selectProduct(int index) {
