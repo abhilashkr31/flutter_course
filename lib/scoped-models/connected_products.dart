@@ -23,12 +23,29 @@ class ConnectedProductsModel extends Model {
       'image':
           'https://www.eatthis.com/wp-content/uploads/2017/10/dark-chocolate-bar-squares-500x366.jpg',
       'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id,
     };
 
-    http.post(
+    http
+        .post(
       'https://flutter-product-manager-ac339.firebaseio.com/products.json',
       body: json.encode(productData),
-    );
+    )
+        .then((http.Response response) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Product newProduct = Product(
+          id: responseData['name'],
+          title: title,
+          description: description,
+          price: price,
+          image: image,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
+      _products.add(newProduct);
+      print(_products);
+      notifyListeners();
+    });
 
     final Product newProduct = Product(
         title: title,
@@ -64,6 +81,32 @@ class ProductsModel extends ConnectedProductsModel {
 
   bool get displayFavoritesOnly {
     return _showFavorites;
+  }
+
+  void fetchProducts() {
+    http
+        .get(
+            'https://flutter-product-manager-ac339.firebaseio.com/products.json')
+        .then((http.Response response) {
+      final List<Product> fetchedProductList = [];
+      final Map<String, dynamic> productListData =
+          json.decode(response.body);
+      productListData
+          .forEach((String productId, dynamic productData) {
+        final Product product = Product(
+          id: productId,
+          title: productData['title'],
+          description: productData['description'],
+          image: productData['image'],
+          price: productData['price'],
+          userEmail: productData['userEmail'],
+          userId: productData['userId'],
+        );
+        fetchedProductList.add(product);
+      });
+      _products = fetchedProductList;
+      notifyListeners();
+    });
   }
 
   void toggleProductFavoriteStatus() {
