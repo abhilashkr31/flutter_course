@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_course/models/product.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
@@ -16,12 +17,13 @@ class ProductsPage extends StatefulWidget {
   }
 }
 
-class _ProductPageState extends State<ProductsPage>{
+class _ProductPageState extends State<ProductsPage> {
   @override
   void initState() {
     widget.model.fetchProducts();
     super.initState();
   }
+
   Drawer _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: Column(
@@ -42,6 +44,24 @@ class _ProductPageState extends State<ProductsPage>{
     );
   }
 
+  Widget _buildProductList() {
+    return ScopedModelDescendant(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget content = Center(
+          child: Text("No Products Found!!"),
+        );
+        if (model.allProducts.length > 0 && !model.isLoading) {
+          content = Products();
+        } else if (model.isLoading) {
+          content = Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return content;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +70,7 @@ class _ProductPageState extends State<ProductsPage>{
         title: Text("Easy List"),
         actions: <Widget>[
           ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
+              builder: (BuildContext context, Widget child, MainModel model) {
             return IconButton(
               icon: Icon(model.displayFavoritesOnly
                   ? Icons.favorite
@@ -62,7 +82,7 @@ class _ProductPageState extends State<ProductsPage>{
           })
         ],
       ),
-      body: Products(),
+      body: _buildProductList(),
     );
   }
 }
