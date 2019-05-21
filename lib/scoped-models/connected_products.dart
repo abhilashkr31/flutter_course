@@ -77,10 +77,10 @@ class ProductsModel extends ConnectedProductsModel {
     return _showFavorites;
   }
 
-  void fetchProducts() {
+  Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-    http
+    return http
         .get(
             'https://flutter-product-manager-ac339.firebaseio.com/products.json')
         .then((http.Response response) {
