@@ -86,6 +86,11 @@ class ProductsModel extends ConnectedProductsModel {
         .then((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
+      if (productListData == null) {
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
       productListData.forEach((String productId, dynamic productData) {
         final Product product = Product(
           id: productId,
@@ -119,18 +124,40 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
   }
 
-  void updateProduct(
+  Future<Null> updateProduct(
       String title, String description, double price, String image) {
-    final Product updatedProduct = Product(
-        title: title,
-        description: description,
-        price: price,
-        image: image,
-        userEmail: selectedProduct.userEmail,
-        userId: selectedProduct.userId);
-    _products[selectedProductIndex] = updatedProduct;
-    print(_products);
-    notifyListeners();
+    _isLoading = true;
+    final Map<String, dynamic> updateData = {
+      'title': title,
+      'description': description,
+      'image':
+          'https://www.eatthis.com/wp-content/uploads/2017/10/dark-chocolate-bar-squares-500x366.jpg',
+      'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id,
+    };
+
+    print(updateData);
+
+    return http
+        .put(
+      'https://flutter-product-manager-ac339.firebaseio.com/products/${selectedProduct.id}.json',
+      body: json.encode(updateData),
+    )
+        .then((http.Response response) {
+      _isLoading = false;
+      final Product updatedProduct = Product(
+          id: selectedProduct.id,
+          title: title,
+          description: description,
+          price: price,
+          image: image,
+          userEmail: selectedProduct.userEmail,
+          userId: selectedProduct.userId);
+      _products[selectedProductIndex] = updatedProduct;
+      print(_products);
+      notifyListeners();
+    });
   }
 
   void deleteProduct() {
