@@ -113,6 +113,7 @@ class ProductsModel extends ConnectedProductsModel {
     final bool isCurrentFavorite = _products[selectedProductIndex].isFavorite;
     final bool newFavoriteStatus = !isCurrentFavorite;
     final Product updatedProduct = Product(
+        id: selectedProduct.id,
         title: selectedProduct.title,
         description: selectedProduct.description,
         price: selectedProduct.price,
@@ -161,9 +162,19 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   void deleteProduct() {
+    _isLoading = true;
+    final deletedProductId = selectedProduct.id;
     _products.removeAt(selectedProductIndex);
-    print(_products);
+    _selProductIndex = null;
     notifyListeners();
+    http
+        .delete(
+            "https://flutter-product-manager-ac339.firebaseio.com/products/${deletedProductId}.json")
+        .then((http.Response response) {
+      _isLoading = false;
+      print(_products);
+      notifyListeners();
+    });
   }
 
   void selectProduct(int index) {
