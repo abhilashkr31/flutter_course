@@ -9,7 +9,7 @@ import '../models/user.dart';
 
 class ConnectedProductsModel extends Model {
   List<Product> _products = [];
-  int _selProductIndex;
+  String _selProductId;
   User _authenticatedUser;
   bool _isLoading;
 
@@ -57,8 +57,8 @@ class ConnectedProductsModel extends Model {
 class ProductsModel extends ConnectedProductsModel {
   bool _showFavorites = false;
 
-  int get selectedProductIndex {
-    return _selProductIndex;
+  String get selectedProductId {
+    return _selProductId;
   }
 
   List<Product> get allProducts {
@@ -69,8 +69,18 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   Product get selectedProduct {
-    if (selectedProductIndex == null) return null;
-    return _products[selectedProductIndex];
+    if (_selProductId == null) {
+      return null;
+    }
+    return _products.firstWhere((Product product) {
+      return product.id == _selProductId;
+    });
+  }
+
+  int get selectedProductIndex {
+    return _products.indexWhere((Product product) {
+      return product.id == _selProductId;
+    });
   }
 
   bool get displayFavoritesOnly {
@@ -165,7 +175,7 @@ class ProductsModel extends ConnectedProductsModel {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
     _products.removeAt(selectedProductIndex);
-    _selProductIndex = null;
+    _selProductId = null;
     notifyListeners();
     http
         .delete(
@@ -177,8 +187,10 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void selectProduct(int index) {
-    _selProductIndex = index;
+  void selectProduct(String productId) {
+    print("Selecting product to id" + productId.toString());
+    _selProductId = productId;
+    notifyListeners();
   }
 
   void toggleDisplayMode() {
