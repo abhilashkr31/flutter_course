@@ -13,7 +13,7 @@ class ConnectedProductsModel extends Model {
   User _authenticatedUser;
   bool _isLoading;
 
-  Future<Null> addProduct(
+  Future<bool> addProduct(
     String title,
     String description,
     double price,
@@ -37,6 +37,11 @@ class ConnectedProductsModel extends Model {
       body: json.encode(productData),
     )
         .then((http.Response response) {
+      if (response.statusCode != 200 && response.statusCode != 200) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
       final Map<String, dynamic> responseData = json.decode(response.body);
       final Product newProduct = Product(
           id: responseData['name'],
@@ -50,6 +55,7 @@ class ConnectedProductsModel extends Model {
       print(_products);
       _isLoading = false;
       notifyListeners();
+      return true;
     });
   }
 }
@@ -116,6 +122,7 @@ class ProductsModel extends ConnectedProductsModel {
       _products = fetchedProductList;
       _isLoading = false;
       notifyListeners();
+      _selProductId = null;
     });
   }
 
