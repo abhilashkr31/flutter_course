@@ -86,25 +86,30 @@ class _ProductEditPageState extends State<ProductEditPage> {
         _formData['description'],
         _formData['price'],
         _formData['image'],
-      ).then((bool success) {
-        if (success) {
-          Navigator.pushReplacementNamed(context, '/products')
-              .then((_) => selectProduct(null));
-        } else {
-          showDialog(context: context, builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Something went Wrong"),
-              content: Text("Please try again"),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text("OK"),
-                )
-              ],
+      ).then(
+        (bool success) {
+          if (success) {
+            Navigator.pushReplacementNamed(context, '/products')
+                .then((_) => selectProduct(null));
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Something went Wrong"),
+                  content: Text("Please try again"),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("OK"),
+                    )
+                  ],
+                );
+              },
             );
-          });
-        }
-      });
+          }
+        },
+      );
     } else {
       updateProduct(
         _formData['title'],
