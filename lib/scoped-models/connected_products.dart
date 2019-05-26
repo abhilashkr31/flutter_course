@@ -11,7 +11,7 @@ class ConnectedProductsModel extends Model {
   List<Product> _products = [];
   String _selProductId;
   User _authenticatedUser;
-  bool _isLoading;
+  bool _isLoading = false;
 }
 
 class ProductsModel extends ConnectedProductsModel {
@@ -32,15 +32,19 @@ class ProductsModel extends ConnectedProductsModel {
     if (_selProductId == null) {
       return null;
     }
-    return _products.firstWhere((Product product) {
-      return product.id == _selProductId;
-    });
+    return _products.firstWhere(
+      (Product product) {
+        return product.id == _selProductId;
+      },
+    );
   }
 
   int get selectedProductIndex {
-    return _products.indexWhere((Product product) {
-      return product.id == _selProductId;
-    });
+    return _products.indexWhere(
+      (Product product) {
+        return product.id == _selProductId;
+      },
+    );
   }
 
   bool get displayFavoritesOnly {
@@ -231,6 +235,8 @@ class UserModel extends ConnectedProductsModel {
   }
 
   Future<Map<String, dynamic>> signup(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
     final Map<String, dynamic> authData = {
       'email': email,
       'password': password,
@@ -243,7 +249,22 @@ class UserModel extends ConnectedProductsModel {
     );
     print(json.decode(response.body));
 
-    return {'success': true, 'message': "Authentication Succesful!"};
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    bool hasError = true;
+    String message = 'Authentication Failed';
+    if (responseData.containsKey('idToken')) {
+      hasError = false;
+      message = 'Authentication Success';
+    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+      message = 'Email already exists.';
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return {
+      'success': !hasError,
+      'message': message,
+    };
   }
 }
 
