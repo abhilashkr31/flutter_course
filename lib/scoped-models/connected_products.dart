@@ -72,7 +72,7 @@ class ProductsModel extends ConnectedProductsModel {
 
     return http
         .post(
-      'https://flutter-product-manager-ac339.firebaseio.com/products.json',
+      'https://flutter-product-manager-ac339.firebaseio.com/products.json?auth=${_authenticatedUser.tokenId}',
       body: json.encode(productData),
     )
         .then((http.Response response) {
@@ -107,7 +107,7 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     return http
         .get(
-            'https://flutter-product-manager-ac339.firebaseio.com/products.json')
+            'https://flutter-product-manager-ac339.firebaseio.com/products.json?auth=${_authenticatedUser.tokenId}')
         .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(response.body);
@@ -152,6 +152,7 @@ class ProductsModel extends ConnectedProductsModel {
         userId: _authenticatedUser.id,
         isFavorite: newFavoriteStatus);
     _products[selectedProductIndex] = updatedProduct;
+    _selProductId = null;
     notifyListeners();
   }
 
@@ -172,7 +173,7 @@ class ProductsModel extends ConnectedProductsModel {
 
     return http
         .put(
-      'https://flutter-product-manager-ac339.firebaseio.com/products/${selectedProduct.id}.json',
+      'https://flutter-product-manager-ac339.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.tokenId}',
       body: json.encode(updateData),
     )
         .then((http.Response response) {
@@ -204,7 +205,7 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     return http
         .delete(
-            "https://flutter-product-manager-ac339.firebaseio.com/products/${deletedProductId}.json")
+            "https://flutter-product-manager-ac339.firebaseio.com/products/${deletedProductId}.json?auth=${_authenticatedUser.tokenId}")
         .then((http.Response response) {
       _isLoading = false;
       print(_products);
@@ -271,6 +272,11 @@ class UserModel extends ConnectedProductsModel {
     if (responseData.containsKey('idToken')) {
       hasError = false;
       message = 'Authentication Success';
+      _authenticatedUser = User(
+        id: responseData['localId'],
+        email: email,
+        tokenId: responseData['idToken'],
+      );
     } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'Email not found.';
     } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
