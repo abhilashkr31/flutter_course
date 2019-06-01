@@ -141,9 +141,10 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void toggleProductFavoriteStatus() {
+  void toggleProductFavoriteStatus() async {
     final bool isCurrentFavorite = _products[selectedProductIndex].isFavorite;
     final bool newFavoriteStatus = !isCurrentFavorite;
+    http.Response response;
     final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: selectedProduct.title,
@@ -154,8 +155,31 @@ class ProductsModel extends ConnectedProductsModel {
         userId: _authenticatedUser.id,
         isFavorite: newFavoriteStatus);
     _products[selectedProductIndex] = updatedProduct;
-    _selProductId = null;
     notifyListeners();
+    if (newFavoriteStatus) {
+      response = await http.put(
+          'https://flutter-product-manager-ac339.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.tokenId}',
+          body: json.encode(true));
+    } else {
+      response = await http.delete(
+          'https://flutter-product-manager-ac339.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.tokenId}');
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      print("Error occurred");
+      final Product updatedProduct = Product(
+          id: selectedProduct.id,
+          title: selectedProduct.title,
+          description: selectedProduct.description,
+          price: selectedProduct.price,
+          image: selectedProduct.image,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id,
+          isFavorite: !newFavoriteStatus);
+      _products[selectedProductIndex] = updatedProduct;
+      notifyListeners();
+    }
+    _selProductId = null;
   }
 
   Future<bool> updateProduct(
@@ -366,7 +390,7 @@ class UserModel extends ConnectedProductsModel {
   }
 
   void setAuthTimeout(int time) {
-    _authTimer = Timer(Duration(milliseconds: time * 2), () {
+    _authTimer = Timer(Duration(seconds: time), () {
       logout();
     });
   }
