@@ -104,7 +104,7 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  Future<Null> fetchProducts() {
+  Future<Null> fetchProducts({onlyForUser = false}) {
     _isLoading = true;
     notifyListeners();
     return http
@@ -127,10 +127,18 @@ class ProductsModel extends ConnectedProductsModel {
           price: productData['price'],
           userEmail: productData['userEmail'],
           userId: productData['userId'],
+          isFavorite: productData['wishlistUsers'] == null
+              ? false
+              : (productData['wishlistUsers'] as Map<String, dynamic>)
+                  .containsKey(_authenticatedUser.id),
         );
         fetchedProductList.add(product);
       });
-      _products = fetchedProductList;
+      _products = onlyForUser == false
+          ? fetchedProductList
+          : fetchedProductList.where((Product product) {
+              return product.userId == _authenticatedUser.id;
+            }).toList();
       _isLoading = false;
       notifyListeners();
       _selProductId = null;
