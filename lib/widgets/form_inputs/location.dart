@@ -5,11 +5,13 @@ import 'package:map_view/map_view.dart';
 import 'package:http/http.dart' as http;
 
 import '../../models/location_data.dart';
+import '../../models/product.dart';
 
 class LocationInput extends StatefulWidget {
   final Function setLocation;
+  final Product product;
 
-  LocationInput(this.setLocation);
+  LocationInput(this.setLocation, this.product);
   @override
   State<StatefulWidget> createState() {
     return _LocationInputState();
@@ -25,6 +27,9 @@ class _LocationInputState extends State<LocationInput> {
   @override
   void initState() {
     _addressInputFocusNode.addListener(_updateLocation);
+    if (widget.product != null) {
+      getStaticMap(widget.product.location.address);
+    }
     super.initState();
   }
 
@@ -42,26 +47,31 @@ class _LocationInputState extends State<LocationInput> {
       widget.setLocation(null);
       return;
     }
-    final Uri uri = Uri.https(
-      'maps.googleapis.com',
-      '/maps/api/geocode/json',
-      {
-        'address': address,
-        'key': 'AIzaSyDP2O_br7gTWG3Qu9Vs5NlFZWKLXFfK4SM',
-      },
-    );
-    final http.Response response = await http.get(uri);
-    final decodeResponse = json.decode(response.body);
-    print(decodeResponse);
+    if (widget.product == null) {
+      final Uri uri = Uri.https(
+        'maps.googleapis.com',
+        '/maps/api/geocode/json',
+        {
+          'address': address,
+          'key': 'AIzaSyDP2O_br7gTWG3Qu9Vs5NlFZWKLXFfK4SM',
+        },
+      );
+      final http.Response response = await http.get(uri);
+      final decodeResponse = json.decode(response.body);
+      print(decodeResponse);
 
-    final formattedAddress = decodeResponse['results'][0]['formatted_address'];
-    final coords = decodeResponse['results'][0]['geometry']['location'];
+      final formattedAddress =
+          decodeResponse['results'][0]['formatted_address'];
+      final coords = decodeResponse['results'][0]['geometry']['location'];
 
-    _locationData = LocationData(
-      latitude: coords['lat'],
-      longitude: coords['lng'],
-      address: formattedAddress,
-    );
+      _locationData = LocationData(
+        latitude: coords['lat'],
+        longitude: coords['lng'],
+        address: formattedAddress,
+      );
+    } else {
+      _locationData = widget.product.location;
+    }
 
     final StaticMapProvider staticMapProvider =
         StaticMapProvider('AIzaSyDP2O_br7gTWG3Qu9Vs5NlFZWKLXFfK4SM');

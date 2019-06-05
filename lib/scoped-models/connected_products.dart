@@ -55,13 +55,8 @@ class ProductsModel extends ConnectedProductsModel {
     return _showFavorites;
   }
 
-  Future<bool> addProduct(
-    String title,
-    String description,
-    double price,
-    String image,
-    LocationData locData
-  ) {
+  Future<bool> addProduct(String title, String description, double price,
+      String image, LocationData locData) {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> productData = {
@@ -96,7 +91,8 @@ class ProductsModel extends ConnectedProductsModel {
           price: price,
           image: image,
           userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id);
+          userId: _authenticatedUser.id,
+          location: locData);
       _products.add(newProduct);
       print(_products);
       _isLoading = false;
@@ -130,6 +126,11 @@ class ProductsModel extends ConnectedProductsModel {
           description: productData['description'],
           image: productData['image'],
           price: productData['price'],
+          location: LocationData(
+            latitude: productData['loc_lat'],
+            longitude: productData['loc_lng'],
+            address: productData['loc_address'],
+          ),
           userEmail: productData['userEmail'],
           userId: productData['userId'],
           isFavorite: productData['wishlistUsers'] == null
@@ -260,7 +261,9 @@ class ProductsModel extends ConnectedProductsModel {
   void selectProduct(String productId) {
     print("Selecting product to id" + productId.toString());
     _selProductId = productId;
-    notifyListeners();
+    if (productId != null) {
+      notifyListeners();
+    }
   }
 
   void toggleDisplayMode() {
