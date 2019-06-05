@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:flutter_course/models/location_data.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,6 +60,7 @@ class ProductsModel extends ConnectedProductsModel {
     String description,
     double price,
     String image,
+    LocationData locData
   ) {
     _isLoading = true;
     notifyListeners();
@@ -70,6 +72,9 @@ class ProductsModel extends ConnectedProductsModel {
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address
     };
 
     return http

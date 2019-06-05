@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_course/models/location_data.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
@@ -19,6 +20,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     'description': null,
     'price': null,
     'image': 'assets/food.jpg',
+    'location': null,
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -73,6 +75,10 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
+  void _setLocation(LocationData locData) {
+    _formData['location'] = locData;
+  }
+
   void _submitForm(
       Function addProduct, Function updateProduct, Function selectProduct,
       [int selectedProductIndex]) {
@@ -87,6 +93,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         _formData['description'],
         _formData['price'],
         _formData['image'],
+        _formData['location'],
       ).then(
         (bool success) {
           if (success) {
@@ -117,6 +124,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         _formData['description'],
         _formData['price'],
         _formData['image'],
+        _formData['location'],
       ).then((_) => Navigator.pushReplacementNamed(context, '/')
           .then((_) => selectProduct(null)));
     }
@@ -163,7 +171,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
               SizedBox(
                 height: 10.0,
               ),
-              LocationInput(),
+              LocationInput(_setLocation),
               SizedBox(
                 height: 10.0,
               ),

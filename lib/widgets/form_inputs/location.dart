@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 import '../../models/location_data.dart';
 
 class LocationInput extends StatefulWidget {
+  final Function setLocation;
+
+  LocationInput(this.setLocation);
   @override
   State<StatefulWidget> createState() {
     return _LocationInputState();
@@ -36,6 +39,7 @@ class _LocationInputState extends State<LocationInput> {
       setState(() {
         _staticMapUri = null;
       });
+      widget.setLocation(null);
       return;
     }
     final Uri uri = Uri.https(
@@ -73,6 +77,7 @@ class _LocationInputState extends State<LocationInput> {
         width: 500,
         height: 300,
         maptype: StaticMapViewType.roadmap);
+    widget.setLocation(_locationData);
     setState(() {
       _addressInputController.text = _locationData.address;
       _staticMapUri = staticMapUri;
