@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:map_view/map_view.dart';
 
 import './pages/auth.dart';
 import './pages/products_admin.dart';
@@ -9,6 +10,7 @@ import './models/product.dart';
 import './scoped-models/main.dart';
 
 void main() {
+  MapView.setApiKey("AIzaSyDP2O_br7gTWG3Qu9Vs5NlFZWKLXFfK4SM");
   runApp(MyApp());
 }
 
