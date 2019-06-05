@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:map_view/map_view.dart';
 import 'package:http/http.dart' as http;
+
+import '../../models/location_data.dart';
 
 class LocationInput extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class _LocationInputState extends State<LocationInput> {
   final FocusNode _addressInputFocusNode = FocusNode();
   final TextEditingController _addressInputController = TextEditingController();
   Uri _staticMapUri;
+  LocationData _locationData;
 
   @override
   void initState() {
@@ -31,6 +33,9 @@ class _LocationInputState extends State<LocationInput> {
 
   void getStaticMap(String address) async {
     if (address.isEmpty) {
+      setState(() {
+        _staticMapUri = null;
+      });
       return;
     }
     final Uri uri = Uri.https(
@@ -48,17 +53,28 @@ class _LocationInputState extends State<LocationInput> {
     final formattedAddress = decodeResponse['results'][0]['formatted_address'];
     final coords = decodeResponse['results'][0]['geometry']['location'];
 
+    _locationData = LocationData(
+      latitude: coords['lat'],
+      longitude: coords['lng'],
+      address: formattedAddress,
+    );
+
     final StaticMapProvider staticMapProvider =
         StaticMapProvider('AIzaSyDP2O_br7gTWG3Qu9Vs5NlFZWKLXFfK4SM');
     final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers([
-      Marker('position', 'Position', coords['lat'], coords['lng']),
+      Marker(
+        'position',
+        'Position',
+        _locationData.latitude,
+        _locationData.longitude,
+      ),
     ],
-        center: Location(coords['lat'], coords['lng']),
+        center: Location(_locationData.latitude, _locationData.longitude),
         width: 500,
         height: 300,
         maptype: StaticMapViewType.roadmap);
     setState(() {
-      _addressInputController.text = formattedAddress;
+      _addressInputController.text = _locationData.address;
       _staticMapUri = staticMapUri;
     });
   }
@@ -77,6 +93,11 @@ class _LocationInputState extends State<LocationInput> {
           autofocus: true,
           focusNode: _addressInputFocusNode,
           controller: _addressInputController,
+          validator: (String input) {
+            if (_locationData == null || input.isEmpty) {
+              return 'No valid loaction found.';
+            }
+          },
           decoration: InputDecoration(labelText: 'Address'),
         ),
         SizedBox(
