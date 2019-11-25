@@ -165,6 +165,7 @@ class ProductsModel extends ConnectedProductsModel {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        location: selectedProduct.location,
         userEmail: _authenticatedUser.email,
         userId: _authenticatedUser.id,
         isFavorite: newFavoriteStatus);
@@ -187,6 +188,7 @@ class ProductsModel extends ConnectedProductsModel {
           description: selectedProduct.description,
           price: selectedProduct.price,
           image: selectedProduct.image,
+          location: selectedProduct.location,
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id,
           isFavorite: !newFavoriteStatus);
@@ -196,8 +198,8 @@ class ProductsModel extends ConnectedProductsModel {
     _selProductId = null;
   }
 
-  Future<bool> updateProduct(
-      String title, String description, double price, String image) {
+  Future<bool> updateProduct(String title, String description, double price,
+      String image, LocationData location) {
     _isLoading = true;
     final Map<String, dynamic> updateData = {
       'title': title,
@@ -207,6 +209,9 @@ class ProductsModel extends ConnectedProductsModel {
       'price': price,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
+      'loc_lat': location.latitude,
+      'loc_lng': location.longitude,
+      'loc_address': location.address,
     };
 
     print(updateData);
@@ -224,6 +229,7 @@ class ProductsModel extends ConnectedProductsModel {
           description: description,
           price: price,
           image: image,
+          location: location,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId);
       _products[selectedProductIndex] = updatedProduct;
